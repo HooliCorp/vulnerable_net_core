@@ -29,7 +29,7 @@ jobs:
         python-version: '3.8'
     - name: Download findings using api and convert to sarif
       run: |
-        sudo pip install shiftleft-scan-reports
+        pip install shiftleft-scan-reports
         slreporter -a vulnerable_net_core --branch $Env:GITHUB_REF -o $Env:GITHUB_WORKSPACE/reports
       env:
         SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
