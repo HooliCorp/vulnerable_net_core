@@ -22,7 +22,6 @@ jobs:
     - name: Analyze with NG SAST
       run: |
         .\sl analyze --wait --app vulnerable_net_core --tag branch=$Env:GITHUB_REF --csharp --dotnet-core --cpg vulnerable_asp_net_core.sln
-        .\sl check-analysis --app vulnerable_net_core --branch "$Env:GITHUB_REF" --report --github-pr-number=${{github.event.number}} --github-pr-user=${{ github.repository_owner }} --github-pr-repo=${{ github.event.repository.name }}  --github-token=${{ secrets.GITHUB_TOKEN }}
       env:
         SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
     - uses: actions/setup-python@v2
@@ -39,3 +38,19 @@ jobs:
       uses: github/codeql-action/upload-sarif@v1
       with:
         sarif_file: reports
+  Build-Rules:
+    runs-on: ubuntu-20.04
+    needs: NextGen-Static-Analysis
+    steps:
+    - uses: actions/checkout@v2
+    - name: Download ShiftLeft CLI
+      run: |
+        curl https://cdn.shiftleft.io/download/sl > ${GITHUB_WORKSPACE}/sl && chmod a+rx ${GITHUB_WORKSPACE}/sl
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+    - name: Validate Build Rules
+      run: ${GITHUB_WORKSPACE}/sl check-analysis --app vulnerable_net_core --branch "${{ github.head_ref || steps.extract_branch.outputs.branch }}" --report --github-pr-number=${{github.event.number}} --github-pr-user=${{ github.repository_owner }} --github-pr-repo=${{ github.event.repository.name }}  --github-token=${{ secrets.GITHUB_TOKEN }}
+      env:
+        SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
