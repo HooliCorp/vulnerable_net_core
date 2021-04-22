@@ -21,7 +21,7 @@ jobs:
       run: dotnet restore vulnerable_asp_net_core.sln
     - name: Analyze with NG SAST
       run: |
-        .\sl analyze --wait --app vulnerable_net_core --tag branch=$Env:GITHUB_REF --csharp --dotnet-core --cpg vulnerable_asp_net_core.sln
+        .\sl analyze --wait --app vulnerable_net_core --tag branch="${{ github.head_ref }}" --csharp --dotnet-core --cpg vulnerable_asp_net_core.sln
       env:
         SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
     - uses: actions/setup-python@v2
