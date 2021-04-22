@@ -1,0 +1,41 @@
+name: Analyze with ShiftLeft NG SAST
+
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  NGSAST-Build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101
+    - name: Download ShiftLeft cli
+      run: |
+        Invoke-WebRequest -Uri 'https://cdn.shiftleft.io/download/sl-latest-windows-x64.zip' -OutFile sl.zip
+        Expand-Archive -Path sl.zip -DestinationPath .
+    - name: Dotnet restore
+      run: dotnet restore vulnerable_asp_net_core.sln
+    - name: Analyze with NG SAST
+      run: |
+        .\sl analyze --wait --app vulnerable_net_core --tag branch=$Env:GITHUB_REF --csharp --dotnet-core --cpg vulnerable_asp_net_core.sln
+        .\sl check-analysis --app vulnerable_net_core --branch "$Env:GITHUB_REF" --report --github-pr-number=${{github.event.number}} --github-pr-user=${{ github.repository_owner }} --github-pr-repo=${{ github.event.repository.name }}  --github-token=${{ secrets.GITHUB_TOKEN }}
+      env:
+        SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Download findings using api and convert to sarif
+      run: |
+        sudo pip install shiftleft-scan-reports
+        slreporter -a vulnerable_net_core --branch $Env:GITHUB_REF -o $Env:GITHUB_WORKSPACE/reports
+      env:
+        SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
+        SHIFTLEFT_ORG_ID: ${{ secrets.SHIFTLEFT_ORG_ID }}
+    - name: Upload sarif
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: reports

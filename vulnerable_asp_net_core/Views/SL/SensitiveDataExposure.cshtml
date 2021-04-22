@@ -1,0 +1,21 @@
+﻿<br></br>
+<br></br>
+
+<h1>Sensitive Data Exposure</h1>
+<h2>Login</h2>
+
+<form>
+    Username:<br>
+    <input type="text" name="name"><br>
+    Password:<br>
+    <input type="password" name="pw">
+    <br>
+    <input type="hidden" id="cardprop" name="cardprop" value="cardno">
+    <input type="submit" value="Login">
+</form>
+
+<br></br>
+
+<div id="frame">
+    @ViewData["result"]
+</div>
