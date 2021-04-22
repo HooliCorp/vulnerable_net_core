@@ -39,9 +39,15 @@ namespace vulnerable_asp_net_core.Controllers
 
             if (name.Length > 0)
             {
+                // SQLi
                 var command = new SQLiteCommand($"SELECT * FROM users WHERE name = '{name}' and pw = '{pw}'",
                     DatabaseUtils._con);
-                using (var reader = command.ExecuteReader())
+                // Safe
+                var command2 = new SQLiteCommand($"SELECT * FROM users WHERE name = @name and pw = @pw",
+                    DatabaseUtils._con);
+                command2.Parameters.AddWithValue("@name", name);
+                command2.Parameters.AddWithValue("@pw", pw);
+                using (var reader = command2.ExecuteReader())
                 {
                     while (reader.Read())
                     {
