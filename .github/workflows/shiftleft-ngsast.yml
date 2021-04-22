@@ -4,7 +4,7 @@ on:
   pull_request:
   workflow_dispatch:
 jobs:
-  NGSAST-Build:
+  NextGen-Static-Analysis:
     runs-on: windows-latest
 
     steps:
