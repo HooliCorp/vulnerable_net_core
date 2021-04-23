@@ -16,9 +16,14 @@ namespace vulnerable_asp_net_core.Controllers
     public class SL : Controller
     {
         JavaScriptEncoder _javaScriptEncoder = JavaScriptEncoder.Default;
+
+        // log4net
+        static readonly log4net.ILog _log4net = log4net.LogManager.GetLogger(typeof(SL));
+
         public void Show(String s)
         {
-            @ViewData["result"] = s;
+            _log4net.Info($"Returning to view {s}");
+            @ViewData["result"] = HtmlEncoder.Default.Encode(s);
         }
 
         [HttpGet]
