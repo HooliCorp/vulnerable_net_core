@@ -8,4 +8,4 @@ RUN dotnet restore vulnerable_asp_net_core.sln
 # Download ShiftLeft
 RUN curl https://cdn.shiftleft.io/download/sl > sl && chmod a+rx sl
 # Perform sl analysis
-RUN ./sl analyze --verbose --app vulnerable_net_core_docker --tag branch=$BRANCH --csharp --dotnet-core --cpg vulnerable_asp_net_core.sln
+RUN ./sl analyze --verbose --wait --app vulnerable_net_core_docker --tag branch=$BRANCH --csharp --dotnet-core --cpg vulnerable_asp_net_core.sln
