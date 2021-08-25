@@ -38,7 +38,7 @@ stages:
       inputs:
         script: |
           $(Agent.HomeDirectory)\sl.exe analyze --wait --app vulnerable_net_core --tag branch=$(Build.SourceBranchName) --csharp --dotnet-core --cpg vulnerable_asp_net_core.sln
-          $(Agent.HomeDirectory)\sl.exe check-analysis --app vulnerable_net_core --branch $(Build.SourceBranchName)
+          $(Agent.HomeDirectory)\sl.exe check-analysis --app vulnerable_net_core --branch $(Build.SourceBranchName) --report
         workingDirectory: '$(Build.SourcesDirectory)'
       env:
         SHIFTLEFT_ACCESS_TOKEN: $(SHIFTLEFT_ACCESS_TOKEN)
