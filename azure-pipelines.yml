@@ -1,0 +1,44 @@
+variables:
+- group: shiftleft-token
+
+trigger:
+- master
+- feature/*
+
+pool:
+  vmImage: 'windows-latest'
+
+stages:
+- stage: Builders
+  displayName: ShiftLeft CORE
+  jobs:
+  - job: Build
+    displayName: Scan .Net and .Net core apps
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: NuGetToolInstaller@1
+
+    - task: PowerShell@2
+      displayName: Download ShiftLeft cli
+      inputs:
+        targetType: 'inline'
+        script: |
+          Invoke-WebRequest -Uri 'https://cdn.shiftleft.io/download/sl-latest-windows-x64.zip' -OutFile $(Agent.HomeDirectory)\sl.zip
+          Expand-Archive -Path $(Agent.HomeDirectory)\sl.zip -DestinationPath $(Agent.HomeDirectory)\
+
+    - task: DotNetCoreCLI@2
+      displayName: Restore web api
+      inputs:
+        command: 'restore'
+        projects: '$(Build.SourcesDirectory)'
+
+    - task: CmdLine@2
+      displayName: Analyze with ShiftLeft CORE
+      inputs:
+        script: |
+          $(Agent.HomeDirectory)\sl.exe analyze --wait --app vulnerable_net_core --tag branch=$(Build.SourceBranchName) --csharp --dotnet-core --cpg vulnerable_asp_net_core.sln
+          $(Agent.HomeDirectory)\sl.exe check-analysis --app vulnerable_net_core --branch $(Build.SourceBranchName)
+        workingDirectory: '$(Build.SourcesDirectory)'
+      env:
+        SHIFTLEFT_ACCESS_TOKEN: $(SHIFTLEFT_ACCESS_TOKEN)
