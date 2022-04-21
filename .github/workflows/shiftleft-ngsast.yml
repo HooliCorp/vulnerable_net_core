@@ -54,6 +54,6 @@ jobs:
       id: extract_branch
     - name: Validate Build Rules
       if: ${{ github.event_name == 'pull_request' }}
-      run: ${GITHUB_WORKSPACE}/sl check-analysis --v2 --verbose --config shiftleft.yml --app vulnerable_net_core --branch "${{ github.head_ref || steps.extract_branch.outputs.branch }}" --report
+      run: ${GITHUB_WORKSPACE}/sl check-analysis --v2 --verbose --config shiftleft.yml --app vulnerable_net_core --report
       env:
         SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
