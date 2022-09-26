@@ -21,7 +21,7 @@ jobs:
       run: dotnet restore vulnerable_asp_net_core.sln
     - name: Analyze with NG SAST
       run: |
-        .\sl analyze --wait --app vulnerable_net_core --tag branch="${{ github.head_ref }}" --csharp --dotnet-core --cpg vulnerable_asp_net_core.sln
+        .\sl analyze --wait --app vulnerable_net_core --tag branch="${{ github.head_ref }}" --csharp --dotnet-framework --cpg vulnerable_asp_net_core.sln
       env:
         SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
     - uses: actions/setup-python@v2
@@ -54,6 +54,6 @@ jobs:
       id: extract_branch
     - name: Validate Build Rules
       if: ${{ github.event_name == 'pull_request' }}
-      run: ${GITHUB_WORKSPACE}/sl check-analysis --v2 --config shiftleft.yml --app vulnerable_net_core --branch "${{ github.head_ref || steps.extract_branch.outputs.branch }}" --report --github-pr-number=${{github.event.number}} --github-pr-user=${{ github.repository_owner }} --github-pr-repo=${{ github.event.repository.name }}  --github-token=${{ secrets.GITHUB_TOKEN }}
+      run: ${GITHUB_WORKSPACE}/sl check-analysis --v2 --config shiftleft.yml --app vulnerable_net_core --report --github-pr-number=${{github.event.number}} --github-pr-user=${{ github.repository_owner }} --github-pr-repo=${{ github.event.repository.name }}  --github-token=${{ secrets.GITHUB_TOKEN }}
       env:
         SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
